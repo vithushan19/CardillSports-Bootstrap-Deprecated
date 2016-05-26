@@ -1,3 +1,26 @@
+var a = {};
+
+
+function print() {
+  console.log('\n');
+  for (var key in a) {
+    if (a.hasOwnProperty(key)) {
+      console.log("DRAGGABLE: " + key + " DROPZONE: " + a[key].id);
+    }
+  }
+  console.log('\n');
+}
+
+function swap(obj){
+  var ret = {};
+  for(var key in obj){
+    ret[obj[key]] = key;
+  }
+  return ret;
+}
+
+
+
 // target elements with the "draggable" class
 interact('.draggable')
   .draggable({
@@ -36,6 +59,10 @@ interact('.draggable')
     target.style.transform =
       'translate(' + x + 'px, ' + y + 'px)';
 
+    if (target.id in a ) {
+      a[target.id].classList.add('drop-empty');  
+    }
+    
     // update the posiion attributes
     target.setAttribute('data-x', x);
     target.setAttribute('data-y', y);
@@ -46,7 +73,7 @@ interact('.draggable')
 
   // enable draggables to be dropped into this
 
-interact('.dropzone').dropzone({
+interact('.drop-empty').dropzone({
   // only accept elements matching this CSS selector
   accept: '.draggable',
   // Require a 75% element overlap for a drop to be possible
@@ -56,11 +83,26 @@ interact('.dropzone').dropzone({
 
   ondropactivate: function (event) {
     // add active dropzone feedback
-    event.target.classList.add('drop-active');
+    var draggableElement = event.relatedTarget,
+        dropzoneElement = event.target;
+    //console.log("ON DROP ACTIVATE: DRAGGABLE: " + draggableElement.id);
+    //console.log("ON DROP ACTIVATE: DROPZONE: " + dropzoneElement.id);
+    
+    if (draggableElement.id in a) {
+      if (dropzoneElement == a[draggableElement.id]) {
+        a[draggableElement.id].classList.add('drop-empty');  
+        print();  
+      }
+      
+    }
+    
+    dropzoneElement.classList.add('drop-active');
   },
   ondragenter: function (event) {
     var draggableElement = event.relatedTarget,
         dropzoneElement = event.target;
+    console.log("ON DRAG ENTER: DRAGGABLE: " + draggableElement.id);
+    console.log("ON DRAG ENTER: DROPZONE: " + dropzoneElement.id);
 
     // feedback the possibility of a drop
     dropzoneElement.classList.add('drop-target');
@@ -68,17 +110,40 @@ interact('.dropzone').dropzone({
     //draggableElement.textContent = 'Dragged in';
   },
   ondragleave: function (event) {
+    var draggableElement = event.relatedTarget,
+        dropzoneElement = event.target;
+    console.log("ON DRAG LEAVE: DRAGGABLE: " + draggableElement.id);
+    console.log("ON DRAG LEAVE: DROPZONE: " + dropzoneElement.id);
+
+    delete a[draggableElement.id]
     // remove the drop feedback style
-    event.target.classList.remove('drop-target');
-    event.relatedTarget.classList.remove('can-drop');
+    dropzoneElement.classList.remove('drop-target');
+    draggableElement.classList.remove('can-drop');
     //event.relatedTarget.textContent = 'Dragged out';
   },
   ondrop: function (event) {
+    var draggableElement = event.relatedTarget,
+        dropzoneElement = event.target;
+    a[draggableElement.id] = dropzoneElement;
+    console.log("ON DROP: DRAGGABLE: " + draggableElement.id);
+    console.log("ON DROP: DROPZONE: " + dropzoneElement.id);
+    
     //event.relatedTarget.textContent = 'Dropped';
   },
   ondropdeactivate: function (event) {
+    var draggableElement = event.relatedTarget,
+        dropzoneElement = event.target;
+    //console.log("ON DROP DEACTIVATE: DRAGGABLE: " + draggableElement.id);
+    //console.log("ON DROP DEACTIVATE: DROPZONE: " + dropzoneElement.id);
+
+    if (draggableElement.id in a) {
+      if (dropzoneElement == a[draggableElement.id]) {
+        a[draggableElement.id].classList.remove('drop-empty'); 
+        print(); 
+      }
+    }
     // remove active dropzone feedback
-    event.target.classList.remove('drop-active');
-    event.target.classList.remove('drop-target');
+    dropzoneElement.classList.remove('drop-active');
+    dropzoneElement.classList.remove('drop-target');
   }
 });

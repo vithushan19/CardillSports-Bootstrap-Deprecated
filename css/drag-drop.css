@@ -12,8 +12,12 @@
   border-radius: 4px;
   margin: 25px 25px 30px;
   padding: 10px;
-  
+  height: 140px;
   transition: background-color 0.3s;
+}
+
+.drop-full {
+  background-color: #ff0000;
 }
 
 .drop-active {
