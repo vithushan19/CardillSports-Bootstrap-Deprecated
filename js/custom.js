@@ -1,6 +1,10 @@
-$('#submit').on('click', function (e) {
+var jumboHeight = $('.jumbotron').outerHeight();
+function parallax(){
+    var scrolled = $(window).scrollTop();
+    $('.bg').css('height', (jumboHeight-scrolled) + 'px');
+    $('.power-of-veto').css('height', (jumboHeight-scrolled) + 'px');
+}
 
-     //your awesome code here
-     alert("VITHU")
-
-})
+$(window).scroll(function(e){
+    parallax();
+});
