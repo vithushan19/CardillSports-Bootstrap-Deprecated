@@ -1,9 +1,3 @@
-$.getScript("interact.min.js", function(){
-
-   alert("Script loaded but not necessarily executed.");
-
-});
-
 // target elements with the "draggable" class
 interact('.draggable')
   .draggable({
