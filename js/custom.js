@@ -6,6 +6,7 @@ function parallax(){
     $('.power-of-veto').css('height', (jumboHeight-scrolled) + 'px');
     $('.not-so-fast').css('height', (jumboHeight-scrolled) + 'px');
     $('.the-day-i-said-what-if').css('height', (jumboHeight-scrolled) + 'px');
+    $('.rd2-gm7').css('height', (jumboHeight-scrolled) + 'px');
 }
 
 $(window).scroll(function(e){
