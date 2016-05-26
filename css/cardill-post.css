@@ -37,7 +37,7 @@
 	      rgba(0, 0, 0, 0.3)
 	    ),
 	 
-	    url(../draft-retro.png);
+	    url(../img/draft-retro.png);
 	    background-repeat: no-repeat;
 	    background-size: 100% 100%;
     height: 500px;
@@ -55,8 +55,21 @@
         rgba(0, 0, 0, 0.3)
       ),
    
-      url(../not-so-fast.jpg);
+      url(../img/not-so-fast.jpg);
       background-repeat: no-repeat;
       background-size: 100% 100%;
 
+}
+
+.the-day-i-said-what-if {
+    background: 
+   
+      linear-gradient(
+        rgba(0, 0, 0, 0.3), 
+        rgba(0, 0, 0, 0.3)
+      ),
+   
+      url(../img/the-day-i-said-what-if.jpg);
+      background-repeat: no-repeat;
+      background-size: 100% 100%;
 }
