@@ -1,25 +1,39 @@
-var a = {};
+var zoneToPlayerMap = {};
+var playerToZoneMap = {};
 
+$('#submit').on('click', function (e) {
+
+      var result = {};
+      var keys = [];
+      var k,i, len;
+
+      //TODO validate zoneToPlayerMap
+      for (k in zoneToPlayerMap) {
+        if (zoneToPlayerMap.hasOwnProperty(k)) {
+          var rank = parseInt(k.substr(9));
+          result[rank] = zoneToPlayerMap[k].id;
+        }
+      }
+
+      console.log(JSON.stringify(result));
+
+})
 
 function print() {
   console.log('\n');
-  for (var key in a) {
-    if (a.hasOwnProperty(key)) {
-      console.log("DRAGGABLE: " + key + " DROPZONE: " + a[key].id);
+  for (var key in playerToZoneMap) {
+    if (playerToZoneMap.hasOwnProperty(key)) {
+      console.log("DRAGGABLE: " + key + " DROPZONE: " + playerToZoneMap[key].id);
+    }
+  }
+  console.log('\n');
+  for (var key in zoneToPlayerMap) {
+    if (zoneToPlayerMap.hasOwnProperty(key)) {
+      console.log("DROPZONE: " + key + " DRAGGABLE: " + zoneToPlayerMap[key].id);
     }
   }
   console.log('\n');
 }
-
-function swap(obj){
-  var ret = {};
-  for(var key in obj){
-    ret[obj[key]] = key;
-  }
-  return ret;
-}
-
-
 
 // target elements with the "draggable" class
 interact('.draggable')
@@ -59,8 +73,8 @@ interact('.draggable')
     target.style.transform =
       'translate(' + x + 'px, ' + y + 'px)';
 
-    if (target.id in a ) {
-      a[target.id].classList.add('drop-empty');  
+    if (target.id in zoneToPlayerMap ) {
+      zoneToPlayerMap[target.id].classList.add('drop-empty');  
     }
     
     // update the posiion attributes
@@ -81,6 +95,7 @@ interact('.drop-empty').dropzone({
 
   // listen for drop related events:
 
+  // This event fires for each possible zone for the draggable elem
   ondropactivate: function (event) {
     // add active dropzone feedback
     var draggableElement = event.relatedTarget,
@@ -88,21 +103,20 @@ interact('.drop-empty').dropzone({
     //console.log("ON DROP ACTIVATE: DRAGGABLE: " + draggableElement.id);
     //console.log("ON DROP ACTIVATE: DROPZONE: " + dropzoneElement.id);
     
-    if (draggableElement.id in a) {
-      if (dropzoneElement == a[draggableElement.id]) {
-        a[draggableElement.id].classList.add('drop-empty');  
-        print();  
+    if (dropzoneElement.id in zoneToPlayerMap) {
+      if (draggableElement == zoneToPlayerMap[dropzoneElement.id]) {
+        //make the current zone droppable again
+        zoneToPlayerMap[dropzoneElement.id].classList.add('drop-empty');  
       }
       
     }
-    
     dropzoneElement.classList.add('drop-active');
   },
   ondragenter: function (event) {
     var draggableElement = event.relatedTarget,
         dropzoneElement = event.target;
-    console.log("ON DRAG ENTER: DRAGGABLE: " + draggableElement.id);
-    console.log("ON DRAG ENTER: DROPZONE: " + dropzoneElement.id);
+    //console.log("ON DRAG ENTER: DRAGGABLE: " + draggableElement.id);
+    //console.log("ON DRAG ENTER: DROPZONE: " + dropzoneElement.id);
 
     // feedback the possibility of a drop
     dropzoneElement.classList.add('drop-target');
@@ -112,10 +126,9 @@ interact('.drop-empty').dropzone({
   ondragleave: function (event) {
     var draggableElement = event.relatedTarget,
         dropzoneElement = event.target;
-    console.log("ON DRAG LEAVE: DRAGGABLE: " + draggableElement.id);
-    console.log("ON DRAG LEAVE: DROPZONE: " + dropzoneElement.id);
+    //console.log("ON DRAG LEAVE: DRAGGABLE: " + draggableElement.id);
+    //console.log("ON DRAG LEAVE: DROPZONE: " + dropzoneElement.id);
 
-    delete a[draggableElement.id]
     // remove the drop feedback style
     dropzoneElement.classList.remove('drop-target');
     draggableElement.classList.remove('can-drop');
@@ -124,9 +137,29 @@ interact('.drop-empty').dropzone({
   ondrop: function (event) {
     var draggableElement = event.relatedTarget,
         dropzoneElement = event.target;
-    a[draggableElement.id] = dropzoneElement;
-    console.log("ON DROP: DRAGGABLE: " + draggableElement.id);
-    console.log("ON DROP: DROPZONE: " + dropzoneElement.id);
+
+    var idToRemove = "0";
+    if (draggableElement.id in playerToZoneMap) {
+      console.log("idToRemove " + idToRemove);
+      idToRemove = playerToZoneMap[draggableElement.id].id;
+      delete zoneToPlayerMap[idToRemove];
+      delete playerToZoneMap[draggableElement.id];
+    }
+
+    if (dropzoneElement.id in zoneToPlayerMap) {
+        zoneToPlayerMap[dropzoneElement.id].classList.remove('can-drop');
+        idToRemove = zoneToPlayerMap[dropzoneElement.id].id;
+        delete zoneToPlayerMap[dropzoneElement.id];
+        delete playerToZoneMap[idToRemove];
+    }
+    
+
+    playerToZoneMap[draggableElement.id] = dropzoneElement;
+    zoneToPlayerMap[dropzoneElement.id] = draggableElement;
+
+    
+    //console.log("ON DROP: DRAGGABLE: " + draggableElement.id);
+    //console.log("ON DROP: DROPZONE: " + dropzoneElement.id);
     
     //event.relatedTarget.textContent = 'Dropped';
   },
@@ -136,10 +169,9 @@ interact('.drop-empty').dropzone({
     //console.log("ON DROP DEACTIVATE: DRAGGABLE: " + draggableElement.id);
     //console.log("ON DROP DEACTIVATE: DROPZONE: " + dropzoneElement.id);
 
-    if (draggableElement.id in a) {
-      if (dropzoneElement == a[draggableElement.id]) {
-        a[draggableElement.id].classList.remove('drop-empty'); 
-        print(); 
+    if (dropzoneElement.id in zoneToPlayerMap) {
+      if (draggableElement == zoneToPlayerMap[dropzoneElement.id]) {
+        zoneToPlayerMap[dropzoneElement.id].classList.remove('drop-empty'); 
       }
     }
     // remove active dropzone feedback
